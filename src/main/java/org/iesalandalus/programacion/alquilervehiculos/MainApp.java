@@ -10,9 +10,13 @@ import org.iesalandalus.programacion.alquilervehiculos.vista.Vista;
 public class MainApp {
 
 	public static void main(String[] args) {
-		Modelo modelo = new ModeloCascada(FactoriaFuenteDatos.FICHEROS);
+		// Ánimo!!!!
+
 		Vista vista = FactoriaVista.TEXTO.crear();
+		Modelo modelo = new ModeloCascada(FactoriaFuenteDatos.MEMORIA.crear());
 		Controlador controlador = new Controlador(modelo, vista);
+
+		vista.setControlador(controlador);
 		controlador.comenzar();
 	}
 
