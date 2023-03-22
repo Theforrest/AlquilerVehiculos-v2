@@ -13,7 +13,7 @@ public class MainApp {
 		// Ánimo!!!!
 
 		Vista vista = FactoriaVista.TEXTO.crear();
-		Modelo modelo = new ModeloCascada(FactoriaFuenteDatos.MEMORIA.crear());
+		Modelo modelo = new ModeloCascada(FactoriaFuenteDatos.FICHEROS.crear());
 		Controlador controlador = new Controlador(modelo, vista);
 
 		vista.setControlador(controlador);

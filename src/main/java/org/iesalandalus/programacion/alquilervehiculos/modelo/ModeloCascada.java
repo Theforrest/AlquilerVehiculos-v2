@@ -14,7 +14,7 @@ import org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.IFuenteDat
 public class ModeloCascada extends Modelo {
 
 	public ModeloCascada(IFuenteDatos fuenteDatos) {
-		setFuenteDatos(fuenteDatos);
+		super(fuenteDatos);
 	}
 
 	@Override

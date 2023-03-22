@@ -1,4 +1,4 @@
-package org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.memoria;
+package org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.ficheros;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -48,11 +48,6 @@ public class Alquileres implements IAlquileres {
 			}
 		}
 		return copiaAlquileres;
-	}
-
-	@Override
-	public int getCantidad() {
-		return coleccionAlquileres.size();
 	}
 
 	private void comprobarAlquiler(Cliente cliente, Vehiculo vehiculo, LocalDate fechaAlquiler)

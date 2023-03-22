@@ -1,4 +1,4 @@
-package org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.memoria;
+package org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.ficheros;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +20,6 @@ public class Vehiculos implements IVehiculos {
 	public List<Vehiculo> get() {
 
 		return new ArrayList<>(coleccionVehiculos);
-	}
-
-	@Override
-	public int getCantidad() {
-		return coleccionVehiculos.size();
 	}
 
 	@Override

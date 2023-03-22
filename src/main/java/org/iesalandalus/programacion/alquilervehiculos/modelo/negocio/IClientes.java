@@ -10,7 +10,6 @@ public interface IClientes {
 
 	List<Cliente> get();
 
-	int getCantidad();
 
 	void insertar(Cliente cliente) throws OperationNotSupportedException;
 

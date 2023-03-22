@@ -21,6 +21,10 @@ public abstract class Modelo {
 	private IAlquileres alquileres;
 	private IFuenteDatos fuenteDatos;
 
+	public Modelo(IFuenteDatos fuenteDatos) {
+		setFuenteDatos(fuenteDatos);
+	}
+	
 	protected IClientes getClientes() {
 		return clientes;
 	}
