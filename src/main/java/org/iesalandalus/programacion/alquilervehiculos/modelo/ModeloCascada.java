@@ -1,6 +1,6 @@
 package org.iesalandalus.programacion.alquilervehiculos.modelo;
 
-import java.time.LocalDate;
+import java.time.LocalDate; 
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,12 +9,11 @@ import javax.naming.OperationNotSupportedException;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Alquiler;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Cliente;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Vehiculo;
-import org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.IFuenteDatos;
 
 public class ModeloCascada extends Modelo {
 
-	public ModeloCascada(IFuenteDatos fuenteDatos) {
-		super(fuenteDatos);
+	public ModeloCascada(FactoriaFuenteDatos factoriaFuenteDatos) {
+		super(factoriaFuenteDatos);
 	}
 
 	@Override
