@@ -20,8 +20,8 @@ import org.xml.sax.SAXException;
 public class Clientes implements IClientes {
 
 	private List<Cliente> coleccionClientes;
-	private static Clientes instancia = new Clientes();
-	private static final File FICHERO_CLIENTES = new File("datos\\clientes.xml");
+	private static Clientes instancia;
+	private static final File FICHERO_CLIENTES = new File(String.format("%s%s%s", "datos", File.separator, "clientes.xml"));
 	private static final String RAIZ = "clientes";
 	private static final String CLIENTE = "cliente";
 	private static final String NOMBRE = "nombre";
@@ -33,6 +33,9 @@ public class Clientes implements IClientes {
 	}
 	
 	static Clientes getInstancia() {
+		if (instancia == null) {
+			instancia = new Clientes();
+		}
 		return instancia;
 	}
 	@Override

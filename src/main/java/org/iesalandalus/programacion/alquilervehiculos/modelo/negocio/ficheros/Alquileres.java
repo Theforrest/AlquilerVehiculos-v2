@@ -25,8 +25,8 @@ import org.xml.sax.SAXException;
 public class Alquileres implements IAlquileres {
 
 	private List<Alquiler> coleccionAlquileres;
-	private static Alquileres instancia = new Alquileres();
-	private static final File FICHERO_ALQUILERES = new File("datos\\alquileres.xml");
+	private static Alquileres instancia;
+	private static final File FICHERO_ALQUILERES = new File(String.format("%s%s%s", "datos", File.separator, "alquileres.xml"));
 	private static final String RAIZ = "alquileres";
 	private static final String ALQUILER = "alquiler";
 	private static final String CLIENTE = "cliente";
@@ -39,6 +39,9 @@ public class Alquileres implements IAlquileres {
 	}
 	
 	static Alquileres getInstancia() {
+		if (instancia == null) {
+			instancia = new Alquileres();
+		}
 		return instancia;
 	}
 	
@@ -107,9 +110,9 @@ public class Alquileres implements IAlquileres {
 	private Element getElemento(Document documentoXml, Alquiler alquiler) {
 	    Element elemento = documentoXml.createElement(ALQUILER);
 	    elemento.setAttribute(CLIENTE, alquiler.getCliente().getDni());
-	    elemento.setAttribute(FECHA_ALQUILER, alquiler.getFechaAlquiler().toString());
+	    elemento.setAttribute(FECHA_ALQUILER, alquiler.getFechaAlquiler().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 	    if (alquiler.getFechaDevolucion() != null) {
-		    elemento.setAttribute(FECHA_DEVOLUCION, alquiler.getFechaDevolucion().toString());
+		    elemento.setAttribute(FECHA_DEVOLUCION, alquiler.getFechaDevolucion().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
 	    }
 	    elemento.setAttribute(VEHICULO, alquiler.getVehiculo().getMatricula());

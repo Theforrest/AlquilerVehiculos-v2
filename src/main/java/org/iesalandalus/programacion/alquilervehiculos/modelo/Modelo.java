@@ -22,7 +22,14 @@ public abstract class Modelo {
 	private IFuenteDatos fuenteDatos;
 
 	protected Modelo(FactoriaFuenteDatos factoriaFuenteDatos) {
+		if (factoriaFuenteDatos == null) {
+		throw new NullPointerException("");
+		}
 		setFuenteDatos(factoriaFuenteDatos.crear());
+		
+		clientes = fuenteDatos.crearClientes();
+		vehiculos = fuenteDatos.crearVehiculos();
+		alquileres = fuenteDatos.crearAlquileres();
 	}
 	
 	protected IClientes getClientes() {
@@ -42,9 +49,11 @@ public abstract class Modelo {
 	}
 
 	public void comenzar() {
-		clientes = fuenteDatos.crearClientes();	
-		vehiculos = fuenteDatos.crearVehiculos();
-		alquileres = fuenteDatos.crearAlquileres();
+		
+		
+		
+		
+		
 		clientes.comenzar();
 		vehiculos.comenzar();
 		alquileres.comenzar();
@@ -52,6 +61,9 @@ public abstract class Modelo {
 
 	public void terminar() {
 		System.out.printf("%nEL modelo ha terminado%n");
+		clientes.terminar();
+		vehiculos.terminar();
+		alquileres.terminar();
 	}
 
 	public abstract void insertar(Cliente cliente) throws OperationNotSupportedException;

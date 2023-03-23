@@ -23,8 +23,8 @@ import org.xml.sax.SAXException;
 public class Vehiculos implements IVehiculos {
 
 	private List<Vehiculo> coleccionVehiculos;
-	private static Vehiculos instancia = new Vehiculos();
-	private static final File FICHERO_VEHICULOS = new File("datos\\vehiculos.xml");
+	private static Vehiculos instancia;
+	private static final File FICHERO_VEHICULOS = new File(String.format("%s%s%s", "datos", File.separator, "vehiculos.xml"));
 	private static final String RAIZ = "vehiculos";
 	private static final String VEHICULO = "vehiculo";
 	private static final String MARCA = "marca";
@@ -43,6 +43,9 @@ public class Vehiculos implements IVehiculos {
 	}
 	
 	static Vehiculos getInstancia() {
+		if (instancia == null) {
+			instancia = new Vehiculos();
+		}
 		return instancia;
 	}
 	@Override
