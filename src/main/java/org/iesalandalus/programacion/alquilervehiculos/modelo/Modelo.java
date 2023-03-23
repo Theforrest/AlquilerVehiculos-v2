@@ -21,8 +21,8 @@ public abstract class Modelo {
 	private IAlquileres alquileres;
 	private IFuenteDatos fuenteDatos;
 
-	public Modelo(IFuenteDatos fuenteDatos) {
-		setFuenteDatos(fuenteDatos);
+	protected Modelo(FactoriaFuenteDatos factoriaFuenteDatos) {
+		setFuenteDatos(factoriaFuenteDatos.crear());
 	}
 	
 	protected IClientes getClientes() {
@@ -42,9 +42,12 @@ public abstract class Modelo {
 	}
 
 	public void comenzar() {
-		clientes = fuenteDatos.crearClientes();
+		clientes = fuenteDatos.crearClientes();	
 		vehiculos = fuenteDatos.crearVehiculos();
 		alquileres = fuenteDatos.crearAlquileres();
+		clientes.comenzar();
+		vehiculos.comenzar();
+		alquileres.comenzar();
 	}
 
 	public void terminar() {

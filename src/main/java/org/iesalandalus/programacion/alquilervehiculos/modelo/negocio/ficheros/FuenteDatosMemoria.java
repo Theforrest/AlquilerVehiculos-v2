@@ -8,14 +8,14 @@ import org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.IVehiculos
 public class FuenteDatosMemoria implements IFuenteDatos {
 
 	public IClientes crearClientes() {
-		return new Clientes();
+		return Clientes.getInstancia();
 	}
 
 	public IVehiculos crearVehiculos() {
-		return new Vehiculos();
+		return Vehiculos.getInstancia();
 	}
 
 	public IAlquileres crearAlquileres() {
-		return new Alquileres();
+		return Alquileres.getInstancia();
 	}
 }

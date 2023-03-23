@@ -7,6 +7,11 @@ import javax.naming.OperationNotSupportedException;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Vehiculo;
 
 public interface IVehiculos {
+	
+	void comenzar();
+	
+	void terminar();
+	
 	List<Vehiculo> get();
 
 	void insertar(Vehiculo vehiculo) throws OperationNotSupportedException;
