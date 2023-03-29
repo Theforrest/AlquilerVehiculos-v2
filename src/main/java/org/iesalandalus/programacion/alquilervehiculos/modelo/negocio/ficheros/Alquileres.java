@@ -26,7 +26,8 @@ public class Alquileres implements IAlquileres {
 
 	private List<Alquiler> coleccionAlquileres;
 	private static Alquileres instancia;
-	private static final File FICHERO_ALQUILERES = new File(String.format("%s%s%s", "datos", File.separator, "alquileres.xml"));
+	private static final File FICHERO_ALQUILERES = new File(
+			String.format("%s%s%s", "datos", File.separator, "alquileres.xml"));
 	private static final String RAIZ = "alquileres";
 	private static final String ALQUILER = "alquiler";
 	private static final String CLIENTE = "cliente";
@@ -37,85 +38,115 @@ public class Alquileres implements IAlquileres {
 	public Alquileres() {
 		coleccionAlquileres = new ArrayList<>();
 	}
-	
+
 	static Alquileres getInstancia() {
 		if (instancia == null) {
 			instancia = new Alquileres();
 		}
 		return instancia;
 	}
-	
+
 	@Override
 	public void comenzar() {
 		try {
 			leerDom(UtilidadesXml.leerXmlDeFichero(FICHERO_ALQUILERES));
-		} catch (ParserConfigurationException | SAXException | IOException | OperationNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			System.out.printf("ERROR: problema de configuración al intentar leer el fichero %s%n", FICHERO_ALQUILERES);
+		} catch (SAXException e) {
+			System.out.printf("ERROR: fallo al intentar leer el fichero %s%n", FICHERO_ALQUILERES);
+		} catch (IOException e) {
+			System.out.printf("%s no ha sido encontrado%n", FICHERO_ALQUILERES);
 		}
 	}
-	
-	private void leerDom(Document documentoXml) throws OperationNotSupportedException {
+
+	private void leerDom(Document documentoXml) {
 		NodeList lista = documentoXml.getElementsByTagName(ALQUILER);
 		for (int i = 0; i < lista.getLength(); i++) {
 			Node nodo = lista.item(i);
 			if (nodo.getNodeType() == Node.ELEMENT_NODE) {
 				Element elemento = (Element) nodo;
-				insertar(getAlquiler(elemento));
+				Alquiler alquiler = null;
+				try {
+					alquiler = getAlquiler(elemento);
+				} catch (OperationNotSupportedException | IllegalArgumentException e) {
+					System.out.printf("%s%n", e.getMessage());
+				}
+				if (alquiler != null) {
+					try {
+						insertar(alquiler);
+					} catch (OperationNotSupportedException e) {
+						System.out.printf("ERROR: No se ha podido insertar el alquiler: %s -> %s%n", alquiler,
+								e.getMessage());
+					}
+				}
 			}
 		}
 	}
-	
-	private Alquiler getAlquiler (Element elemento) {
-		String cliente = elemento.getAttribute(CLIENTE);
-		String vehiculo = elemento.getAttribute(VEHICULO);
+
+	private Alquiler getAlquiler(Element elemento) throws OperationNotSupportedException {
+		String clienteTexto = elemento.getAttribute(CLIENTE);
+		String vehiculoTexto = elemento.getAttribute(VEHICULO);
 		String fechaAlquiler = elemento.getAttribute(FECHA_ALQUILER);
 		String fechaDevolucion = elemento.getAttribute(FECHA_DEVOLUCION);
-		
-		Alquiler alquiler = new Alquiler(Clientes.getInstancia().buscar(Cliente.getClienteConDni(cliente)), Vehiculos.getInstancia().buscar(Vehiculo.getVehiculoConMatricula(vehiculo)), LocalDate.parse(fechaAlquiler, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-		
-		
+
+		Cliente cliente = Clientes.getInstancia().buscar(Cliente.getClienteConDni(clienteTexto));
+		Vehiculo vehiculo = Vehiculos.getInstancia().buscar(Vehiculo.getVehiculoConMatricula(vehiculoTexto));
+
+		if (cliente == null) {
+			throw new OperationNotSupportedException("ERR: El cliente no existe");
+		} else if (vehiculo == null) {
+			throw new OperationNotSupportedException("ERR: El vehiculo no existe");
+		}
+		Alquiler alquiler = new Alquiler(cliente, vehiculo,
+				LocalDate.parse(fechaAlquiler, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
 		if (!fechaDevolucion.isBlank()) {
 			try {
 				alquiler.devolver(LocalDate.parse(fechaDevolucion, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 			} catch (OperationNotSupportedException e) {
 			}
 		}
-		
-		
+
 		return alquiler;
 	}
+
 	@Override
 	public void terminar() {
 		try {
 			UtilidadesXml.escribirXmlAFichero(crearDom(), FICHERO_ALQUILERES);
-		} catch (TransformerException | ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (TransformerException e) {
+			System.out.printf("Error: No se ha podido llevar a cabo la transformación del fichero %s%n",
+					FICHERO_ALQUILERES);
+		} catch (ParserConfigurationException e) {
+			System.out.printf("ERROR: problema de configuración al intentar pasar los datos al fichero %s%n",
+					FICHERO_ALQUILERES);
+
 		}
 	}
-	
+
 	private Document crearDom() throws ParserConfigurationException {
 		Document documento = UtilidadesXml.crearConstructorDocumentoXml().newDocument();
-	    Element raiz = documento.createElement(RAIZ);
-	    documento.appendChild(raiz);
-	    
-	    for(Alquiler alquiler : coleccionAlquileres) {
-	    	raiz.appendChild(getElemento(documento, alquiler));
-	    }
-	    
+		Element raiz = documento.createElement(RAIZ);
+		documento.appendChild(raiz);
+
+		for (Alquiler alquiler : coleccionAlquileres) {
+			raiz.appendChild(getElemento(documento, alquiler));
+		}
+
 		return documento;
 	}
-	
-	private Element getElemento(Document documentoXml, Alquiler alquiler) {
-	    Element elemento = documentoXml.createElement(ALQUILER);
-	    elemento.setAttribute(CLIENTE, alquiler.getCliente().getDni());
-	    elemento.setAttribute(FECHA_ALQUILER, alquiler.getFechaAlquiler().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-	    if (alquiler.getFechaDevolucion() != null) {
-		    elemento.setAttribute(FECHA_DEVOLUCION, alquiler.getFechaDevolucion().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
-	    }
-	    elemento.setAttribute(VEHICULO, alquiler.getVehiculo().getMatricula());
+	private Element getElemento(Document documentoXml, Alquiler alquiler) {
+		Element elemento = documentoXml.createElement(ALQUILER);
+		elemento.setAttribute(CLIENTE, alquiler.getCliente().getDni());
+		elemento.setAttribute(FECHA_ALQUILER,
+				alquiler.getFechaAlquiler().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		if (alquiler.getFechaDevolucion() != null) {
+			elemento.setAttribute(FECHA_DEVOLUCION,
+					alquiler.getFechaDevolucion().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+		}
+		elemento.setAttribute(VEHICULO, alquiler.getVehiculo().getMatricula());
 
 		return elemento;
 	}
@@ -202,7 +233,7 @@ public class Alquileres implements IAlquileres {
 		if (!(coleccionAlquileres.contains(alquiler))) {
 			throw new OperationNotSupportedException("ERROR: No existe ningún alquiler igual.");
 		}
-		coleccionAlquileres.remove(buscar(alquiler));
+		coleccionAlquileres.remove(alquiler);
 
 	}
 
@@ -257,6 +288,5 @@ public class Alquileres implements IAlquileres {
 
 		return alquiler;
 	}
-
 
 }

@@ -54,30 +54,29 @@ public class Consola {
 	}
 
 	private static LocalDate leerFecha(String mensaje, String patron) {
-		String fecha;
+		String fechaTexto;
+		LocalDate fecha = null;
 
 		do {
 			System.out.printf("%n%s (%s): ", mensaje, patron);
-			fecha = Entrada.cadena();
+			fechaTexto = Entrada.cadena();
 			if (patron.equals(PATRON_MES)) {
-				fecha = "01/" + fecha;
+				fechaTexto = "01/" + fechaTexto;
 			}
 			try {
-				return LocalDate.parse(fecha, FORMATO_FECHA);
+				fecha = LocalDate.parse(fechaTexto, FORMATO_FECHA);
 			} catch (DateTimeParseException e) {
 				System.out.printf("%nFormato de fecha incorrecta");
-				fecha = null;
 			}
-		} while (true);
+		} while (fecha == null);
+		return fecha;
 	}
 
 	public static Accion elegirAccion() {
 		Accion accion = null;
-		int i;
 		do {
-			i = leerEntero("Elige una acción");
 			try {
-				accion = Accion.get(i);
+				accion = Accion.get(leerEntero("Elige una acción"));
 			} catch (OperationNotSupportedException e) {
 				System.out.printf("%n%s%n%n", e.getMessage());
 			}

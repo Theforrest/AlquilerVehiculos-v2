@@ -15,9 +15,12 @@ import org.iesalandalus.programacion.alquilervehiculos.vista.Vista;
 
 public class VistaTexto extends Vista {
 
+	public VistaTexto() {
+		Accion.setVista(this);
+	}
+
 	public void comenzar() {
 		Accion accion;
-		Accion.setVista(this);
 		do {
 			Consola.mostrarMenuAcciones();
 			accion = Consola.elegirAccion();
@@ -200,24 +203,14 @@ public class VistaTexto extends Vista {
 		} else {
 			System.out.print("\nEse vehículos no tiene alquileres que listar\n");
 		}
-		
+
 	}
 
 	private Map<TipoVehiculo, Integer> inicializarEstadisticas() {
 		Map<TipoVehiculo, Integer> estadisticas = new TreeMap<>();
-		LocalDate mes = Consola.leerMes();
 
-		List<Alquiler> alquileres = getControlador().getAlquileres();
-
-		for (Alquiler alquiler : alquileres) {
-			if (alquiler.getFechaAlquiler().getMonth().equals(mes.getMonth())
-					&& alquiler.getFechaAlquiler().getYear() == mes.getYear()) {
-				estadisticas.put(TipoVehiculo.get(alquiler.getVehiculo()),
-						estadisticas.containsKey(TipoVehiculo.get(alquiler.getVehiculo()))
-								? estadisticas.get(TipoVehiculo.get(alquiler.getVehiculo())) + 1
-								: 1);
-
-			}
+		for (TipoVehiculo tipoVehiculo : TipoVehiculo.values()) {
+			estadisticas.put(tipoVehiculo, 0);
 		}
 
 		return estadisticas;
@@ -225,6 +218,20 @@ public class VistaTexto extends Vista {
 
 	public void mostrarEstadisticasMensuales() {
 		Map<TipoVehiculo, Integer> estadisticas = inicializarEstadisticas();
+
+		LocalDate mes = Consola.leerMes();
+
+		List<Alquiler> alquileres = getControlador().getAlquileres();
+
+		for (Alquiler alquiler : alquileres) {
+			if (alquiler.getFechaAlquiler().getMonth().equals(mes.getMonth())
+					&& alquiler.getFechaAlquiler().getYear() == mes.getYear()) {
+				TipoVehiculo tipoVehiculo = TipoVehiculo.get(alquiler.getVehiculo());
+				estadisticas.put(tipoVehiculo, estadisticas.get(tipoVehiculo) + 1);
+
+			}
+		}
+
 		if (!estadisticas.isEmpty()) {
 			for (Map.Entry<TipoVehiculo, Integer> entry : estadisticas.entrySet()) {
 				System.out.printf("%s alquilados: %s%n", entry.getKey(), entry.getValue());

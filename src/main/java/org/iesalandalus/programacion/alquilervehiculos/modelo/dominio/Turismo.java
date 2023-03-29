@@ -12,7 +12,7 @@ public class Turismo extends Vehiculo {
 
 	public Turismo(Turismo turismo) {
 		super(turismo);
-		setCilindrada(turismo.getCilindrada());
+		cilindrada = turismo.getCilindrada();
 	}
 
 	@Override

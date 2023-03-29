@@ -1,6 +1,6 @@
 package org.iesalandalus.programacion.alquilervehiculos.modelo;
 
-import java.time.LocalDate; 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package org.iesalandalus.programacion.alquilervehiculos.modelo;
 
-import java.time.LocalDate;  
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
@@ -13,7 +13,6 @@ import org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.IClientes;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.IFuenteDatos;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.IVehiculos;
 
-
 public abstract class Modelo {
 
 	private IClientes clientes;
@@ -23,15 +22,15 @@ public abstract class Modelo {
 
 	protected Modelo(FactoriaFuenteDatos factoriaFuenteDatos) {
 		if (factoriaFuenteDatos == null) {
-		throw new NullPointerException("");
+			throw new NullPointerException("");
 		}
 		setFuenteDatos(factoriaFuenteDatos.crear());
-		
+
 		clientes = fuenteDatos.crearClientes();
 		vehiculos = fuenteDatos.crearVehiculos();
 		alquileres = fuenteDatos.crearAlquileres();
 	}
-	
+
 	protected IClientes getClientes() {
 		return clientes;
 	}
@@ -49,11 +48,7 @@ public abstract class Modelo {
 	}
 
 	public void comenzar() {
-		
-		
-		
-		
-		
+
 		clientes.comenzar();
 		vehiculos.comenzar();
 		alquileres.comenzar();
@@ -78,7 +73,8 @@ public abstract class Modelo {
 
 	public abstract Alquiler buscar(Alquiler alquiler);
 
-	public abstract void modificar(Cliente cliente, String nombre, String telefono) throws OperationNotSupportedException;
+	public abstract void modificar(Cliente cliente, String nombre, String telefono)
+			throws OperationNotSupportedException;
 
 	public abstract void devolver(Cliente cliente, LocalDate fechaDevolucion) throws OperationNotSupportedException;
 

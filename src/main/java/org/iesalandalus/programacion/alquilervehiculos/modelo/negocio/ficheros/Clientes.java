@@ -21,78 +21,105 @@ public class Clientes implements IClientes {
 
 	private List<Cliente> coleccionClientes;
 	private static Clientes instancia;
-	private static final File FICHERO_CLIENTES = new File(String.format("%s%s%s", "datos", File.separator, "clientes.xml"));
+	private static final File FICHERO_CLIENTES = new File(
+			String.format("%s%s%s", "datos", File.separator, "clientes.xml"));
 	private static final String RAIZ = "clientes";
 	private static final String CLIENTE = "cliente";
 	private static final String NOMBRE = "nombre";
 	private static final String DNI = "dni";
 	private static final String TELEFONO = "telefono";
-	
+
 	private Clientes() {
 		coleccionClientes = new ArrayList<>();
 	}
-	
+
 	static Clientes getInstancia() {
 		if (instancia == null) {
 			instancia = new Clientes();
 		}
 		return instancia;
 	}
+
 	@Override
 	public void comenzar() {
 		try {
 			leerDom(UtilidadesXml.leerXmlDeFichero(FICHERO_CLIENTES));
-		} catch (ParserConfigurationException | SAXException | IOException | OperationNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			System.out.printf("ERROR: problema de configuración al intentar leer el fichero %s%n", FICHERO_CLIENTES);
+		} catch (SAXException e) {
+			System.out.printf("ERROR: fallo al intentar leer el fichero %s%n", FICHERO_CLIENTES);
+		} catch (IOException e) {
+			System.out.printf("ERROR: %s no ha sido encontrado%n", FICHERO_CLIENTES);
 		}
 	}
-	
-	private void leerDom(Document documentoXml) throws OperationNotSupportedException {
+
+	private void leerDom(Document documentoXml) {
+		if (documentoXml == null) {
+			throw new NullPointerException("ERROR: El documento no puede ser nulo");
+		}
 		NodeList lista = documentoXml.getElementsByTagName(CLIENTE);
 		for (int i = 0; i < lista.getLength(); i++) {
 			Node nodo = lista.item(i);
 			if (nodo.getNodeType() == Node.ELEMENT_NODE) {
 				Element elemento = (Element) nodo;
-				insertar(getCliente(elemento));
+				Cliente cliente = null;
+				try {
+					cliente = getCliente(elemento);
+				} catch (IllegalArgumentException e) {
+					System.out.printf("%s%n", e.getMessage());
+				}
+				if (cliente != null) {
+					try {
+						insertar(cliente);
+					} catch (OperationNotSupportedException e) {
+						System.out.printf("ERROR: No se ha podido insertar al cliente: %s -> %s%n", cliente,
+								e.getMessage());
+					}
+				}
+
 			}
 		}
 	}
-	
-	private Cliente getCliente (Element elemento) {
+
+	private Cliente getCliente(Element elemento) {
 		String nombre = elemento.getAttribute(NOMBRE);
 		String dni = elemento.getAttribute(DNI);
 		String telefono = elemento.getAttribute(TELEFONO);
-		
+
 		return new Cliente(nombre, dni, telefono);
 	}
+
 	@Override
 	public void terminar() {
 		try {
 			UtilidadesXml.escribirXmlAFichero(crearDom(), FICHERO_CLIENTES);
-		} catch (TransformerException | ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (TransformerException e) {
+			System.out.printf("Error: No se ha podido llevar a cabo la transformación del fichero %s%n",
+					FICHERO_CLIENTES);
+		} catch (ParserConfigurationException e) {
+			System.out.printf("ERROR: problema de configuración al intentar pasar los datos al fichero %s%n",
+					FICHERO_CLIENTES);
+
 		}
 	}
-	
+
 	private Document crearDom() throws ParserConfigurationException {
 		Document documento = UtilidadesXml.crearConstructorDocumentoXml().newDocument();
-	    Element raiz = documento.createElement(RAIZ);
-	    documento.appendChild(raiz);
-	    
-	    for(Cliente cliente : coleccionClientes) {
-	    	raiz.appendChild(getElemento(documento, cliente));
-	    }
-	    
+		Element raiz = documento.createElement(RAIZ);
+		documento.appendChild(raiz);
+
+		for (Cliente cliente : coleccionClientes) {
+			raiz.appendChild(getElemento(documento, cliente));
+		}
+
 		return documento;
 	}
-	
+
 	private Element getElemento(Document documentoXml, Cliente cliente) {
-	    Element elemento = documentoXml.createElement(CLIENTE);
-	    elemento.setAttribute(NOMBRE, cliente.getNombre());
-	    elemento.setAttribute(DNI, cliente.getDni());
-	    elemento.setAttribute(TELEFONO, cliente.getTelefono());
+		Element elemento = documentoXml.createElement(CLIENTE);
+		elemento.setAttribute(NOMBRE, cliente.getNombre());
+		elemento.setAttribute(DNI, cliente.getDni());
+		elemento.setAttribute(TELEFONO, cliente.getTelefono());
 
 		return elemento;
 	}
@@ -131,7 +158,7 @@ public class Clientes implements IClientes {
 		if (cliente == null) {
 			throw new NullPointerException("ERROR: No se puede borrar un cliente nulo.");
 		}
-		if (!coleccionClientes.remove(buscar(cliente))) {
+		if (!coleccionClientes.remove(cliente)) {
 			throw new OperationNotSupportedException("ERROR: No existe ningún cliente con ese DNI.");
 		}
 	}

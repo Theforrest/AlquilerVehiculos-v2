@@ -1,6 +1,6 @@
 package org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.ficheros;
 
-import java.io.File; 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,8 @@ public class Vehiculos implements IVehiculos {
 
 	private List<Vehiculo> coleccionVehiculos;
 	private static Vehiculos instancia;
-	private static final File FICHERO_VEHICULOS = new File(String.format("%s%s%s", "datos", File.separator, "vehiculos.xml"));
+	private static final File FICHERO_VEHICULOS = new File(
+			String.format("%s%s%s", "datos", File.separator, "vehiculos.xml"));
 	private static final String RAIZ = "vehiculos";
 	private static final String VEHICULO = "vehiculo";
 	private static final String MARCA = "marca";
@@ -41,109 +42,133 @@ public class Vehiculos implements IVehiculos {
 	private Vehiculos() {
 		coleccionVehiculos = new ArrayList<>();
 	}
-	
+
 	static Vehiculos getInstancia() {
 		if (instancia == null) {
 			instancia = new Vehiculos();
 		}
 		return instancia;
 	}
+
 	@Override
 	public void comenzar() {
 		try {
 			leerDom(UtilidadesXml.leerXmlDeFichero(FICHERO_VEHICULOS));
-		} catch (ParserConfigurationException | SAXException | IOException | OperationNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			System.out.printf("ERROR: problema de configuración al intentar leer el fichero %s%n", FICHERO_VEHICULOS);
+		} catch (SAXException e) {
+			System.out.printf("ERROR: fallo al intentar leer el fichero %s%n", FICHERO_VEHICULOS);
+		} catch (IOException e) {
+			System.out.printf("%s no ha sido encontrado%n", FICHERO_VEHICULOS);
 		}
 	}
-	
-	private void leerDom(Document documentoXml) throws OperationNotSupportedException {
+
+	private void leerDom(Document documentoXml) {
+		if (documentoXml == null) {
+			throw new NullPointerException("ERR: El documento no puede ser nulo");
+		}
 		NodeList lista = documentoXml.getElementsByTagName(VEHICULO);
 		for (int i = 0; i < lista.getLength(); i++) {
 			Node nodo = lista.item(i);
 			if (nodo.getNodeType() == Node.ELEMENT_NODE) {
 				Element elemento = (Element) nodo;
-				insertar(getVehiculo(elemento));
+				Vehiculo vehiculo = null;
+				try {
+					vehiculo = getVehiculo(elemento);
+				} catch (IllegalArgumentException e) {
+					System.out.printf("%s%n", e.getMessage());
+				}
+				if (vehiculo != null) {
+					try {
+						insertar(vehiculo);
+					} catch (OperationNotSupportedException e) {
+						System.out.printf("ERROR: No se ha podido insertar el vehiculo: %s -> %s%n", vehiculo,
+								e.getMessage());
+					}
+				}
 			}
 		}
 	}
-	
-	private Vehiculo getVehiculo (Element elemento) {
+
+	private Vehiculo getVehiculo(Element elemento) {
 		String marca = elemento.getAttribute(MARCA);
 		String modelo = elemento.getAttribute(MODELO);
 		String matricula = elemento.getAttribute(MATRICULA);
 		String tipo = elemento.getAttribute(TIPO);
-		
+
 		Vehiculo vehiculo = null;
 		switch (tipo) {
 		case TURISMO: {
 			String cilindrada = elemento.getAttribute(CILINDRADA);
 
-			vehiculo =  new Turismo(marca, modelo, Integer.parseInt(cilindrada), matricula);
+			vehiculo = new Turismo(marca, modelo, Integer.parseInt(cilindrada), matricula);
 			break;
 		}
 		case AUTOBUS: {
 			String plazas = elemento.getAttribute(PLAZAS);
 
-			vehiculo =  new Autobus(marca, modelo, Integer.parseInt(plazas), matricula);
+			vehiculo = new Autobus(marca, modelo, Integer.parseInt(plazas), matricula);
 			break;
 		}
 		case FURGONETA: {
 			String plazas = elemento.getAttribute(PLAZAS);
 			String pma = elemento.getAttribute(PMA);
 
-			vehiculo =  new Furgoneta(marca, modelo,Integer.parseInt(pma), Integer.parseInt(plazas), matricula);
+			vehiculo = new Furgoneta(marca, modelo, Integer.parseInt(pma), Integer.parseInt(plazas), matricula);
 			break;
 		}
 		default:
 		}
 		return vehiculo;
 	}
-	
+
 	@Override
 	public void terminar() {
 		try {
 			UtilidadesXml.escribirXmlAFichero(crearDom(), FICHERO_VEHICULOS);
-		} catch (TransformerException | ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (TransformerException e) {
+			System.out.printf("Error: No se ha podido llevar a cabo la transformación del fichero %s%n",
+					FICHERO_VEHICULOS);
+		} catch (ParserConfigurationException e) {
+			System.out.printf("ERROR: problema de configuración al intentar pasar los datos al fichero %s%n",
+					FICHERO_VEHICULOS);
+
 		}
 	}
-	
+
 	private Document crearDom() throws ParserConfigurationException {
 		Document documento = UtilidadesXml.crearConstructorDocumentoXml().newDocument();
-	    Element raiz = documento.createElement(RAIZ);
-	    documento.appendChild(raiz);
-	    
-	    for(Vehiculo vehiculo : coleccionVehiculos) {
-	    	raiz.appendChild(getElemento(documento, vehiculo));
-	    }
-	    
+		Element raiz = documento.createElement(RAIZ);
+		documento.appendChild(raiz);
+
+		for (Vehiculo vehiculo : coleccionVehiculos) {
+			raiz.appendChild(getElemento(documento, vehiculo));
+		}
+
 		return documento;
 	}
-	
+
 	private Element getElemento(Document documentoXml, Vehiculo vehiculo) {
-	    Element elemento = documentoXml.createElement(VEHICULO);
-	    elemento.setAttribute(MARCA, vehiculo.getMarca());
-	    elemento.setAttribute(MODELO, vehiculo.getModelo());
-	    elemento.setAttribute(MATRICULA, vehiculo.getMatricula());
-	    
-	    if (vehiculo instanceof Turismo turismo) {
-	    	elemento.setAttribute(CILINDRADA, Integer.toString(turismo.getCilindrada()));
-		    elemento.setAttribute(TIPO, TURISMO);
-	    } else if (vehiculo instanceof Autobus autobus) {
-	    	elemento.setAttribute(PLAZAS, Integer.toString(autobus.getPlazas()));
-		    elemento.setAttribute(TIPO, AUTOBUS);
-	    } else if (vehiculo instanceof Furgoneta furgoneta) {
-	    	elemento.setAttribute(PMA, Integer.toString(furgoneta.getPma()));
-	    	elemento.setAttribute(PLAZAS, Integer.toString(furgoneta.getPlazas()));
-		    elemento.setAttribute(TIPO, FURGONETA);
-	    }
-	    
+		Element elemento = documentoXml.createElement(VEHICULO);
+		elemento.setAttribute(MARCA, vehiculo.getMarca());
+		elemento.setAttribute(MODELO, vehiculo.getModelo());
+		elemento.setAttribute(MATRICULA, vehiculo.getMatricula());
+
+		if (vehiculo instanceof Turismo turismo) {
+			elemento.setAttribute(CILINDRADA, Integer.toString(turismo.getCilindrada()));
+			elemento.setAttribute(TIPO, TURISMO);
+		} else if (vehiculo instanceof Autobus autobus) {
+			elemento.setAttribute(PLAZAS, Integer.toString(autobus.getPlazas()));
+			elemento.setAttribute(TIPO, AUTOBUS);
+		} else if (vehiculo instanceof Furgoneta furgoneta) {
+			elemento.setAttribute(PMA, Integer.toString(furgoneta.getPma()));
+			elemento.setAttribute(PLAZAS, Integer.toString(furgoneta.getPlazas()));
+			elemento.setAttribute(TIPO, FURGONETA);
+		}
 
 		return elemento;
 	}
+
 	@Override
 	public List<Vehiculo> get() {
 
@@ -179,11 +204,9 @@ public class Vehiculos implements IVehiculos {
 		if (vehiculo == null) {
 			throw new NullPointerException("ERROR: No se puede borrar un vehículo nulo.");
 		}
-		if (!coleccionVehiculos.remove(buscar(vehiculo))) {
+		if (!coleccionVehiculos.remove(vehiculo)) {
 			throw new OperationNotSupportedException("ERROR: No existe ningún vehículo con esa matrícula.");
 		}
 	}
-
-	
 
 }
