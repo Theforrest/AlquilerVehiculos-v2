@@ -55,10 +55,10 @@ public abstract class Modelo {
 	}
 
 	public void terminar() {
-		System.out.printf("%nEL modelo ha terminado%n");
 		clientes.terminar();
 		vehiculos.terminar();
 		alquileres.terminar();
+		System.out.printf("%nEL modelo ha terminado%n");
 	}
 
 	public abstract void insertar(Cliente cliente) throws OperationNotSupportedException;

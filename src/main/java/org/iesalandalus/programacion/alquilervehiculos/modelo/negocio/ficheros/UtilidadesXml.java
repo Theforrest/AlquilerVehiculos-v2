@@ -42,17 +42,19 @@ public class UtilidadesXml {
 	}
 
 	public static void escribirXmlAFichero(Document documento, File salida) throws TransformerException {
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		// to be compliant, prohibit the use of all protocols by external entities:
-		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+		if (salida.exists()) {
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			// to be compliant, prohibit the use of all protocols by external entities:
+			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
-		Transformer transformer = transformerFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		DOMSource source = new DOMSource(documento);
-		StreamResult result = new StreamResult(salida);
+			Transformer transformer = transformerFactory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			DOMSource source = new DOMSource(documento);
+			StreamResult result = new StreamResult(salida);
 
-		transformer.transform(source, result);
+			transformer.transform(source, result);
+		}
 	}
 
 	public static Document leerXmlDeFichero(File ficheroXml)

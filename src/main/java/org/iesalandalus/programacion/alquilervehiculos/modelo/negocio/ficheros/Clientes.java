@@ -62,19 +62,11 @@ public class Clientes implements IClientes {
 			Node nodo = lista.item(i);
 			if (nodo.getNodeType() == Node.ELEMENT_NODE) {
 				Element elemento = (Element) nodo;
-				Cliente cliente = null;
 				try {
-					cliente = getCliente(elemento);
-				} catch (IllegalArgumentException e) {
-					System.out.printf("%s%n", e.getMessage());
-				}
-				if (cliente != null) {
-					try {
-						insertar(cliente);
-					} catch (OperationNotSupportedException e) {
-						System.out.printf("ERROR: No se ha podido insertar al cliente: %s -> %s%n", cliente,
-								e.getMessage());
-					}
+					insertar(getCliente(elemento));
+				} catch (OperationNotSupportedException | IllegalArgumentException e) {
+					System.out.printf("ERROR: No se ha podido insertar el cliente número %s -> %s%n", i,
+							e.getMessage());
 				}
 
 			}
@@ -101,6 +93,7 @@ public class Clientes implements IClientes {
 					FICHERO_CLIENTES);
 
 		}
+
 	}
 
 	private Document crearDom() throws ParserConfigurationException {

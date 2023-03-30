@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +29,7 @@ public class Alquileres implements IAlquileres {
 	private static Alquileres instancia;
 	private static final File FICHERO_ALQUILERES = new File(
 			String.format("%s%s%s", "datos", File.separator, "alquileres.xml"));
+	private static final DateTimeFormatter FORMAT_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private static final String RAIZ = "alquileres";
 	private static final String ALQUILER = "alquiler";
 	private static final String CLIENTE = "cliente";
@@ -65,20 +67,13 @@ public class Alquileres implements IAlquileres {
 			Node nodo = lista.item(i);
 			if (nodo.getNodeType() == Node.ELEMENT_NODE) {
 				Element elemento = (Element) nodo;
-				Alquiler alquiler = null;
 				try {
-					alquiler = getAlquiler(elemento);
-				} catch (OperationNotSupportedException | IllegalArgumentException e) {
-					System.out.printf("%s%n", e.getMessage());
+					insertar(getAlquiler(elemento));
+				} catch (OperationNotSupportedException | IllegalArgumentException | DateTimeParseException e) {
+					System.out.printf("ERROR: No se ha podido insertar el alquiler número %s -> %s%n", i,
+							e.getMessage());
 				}
-				if (alquiler != null) {
-					try {
-						insertar(alquiler);
-					} catch (OperationNotSupportedException e) {
-						System.out.printf("ERROR: No se ha podido insertar el alquiler: %s -> %s%n", alquiler,
-								e.getMessage());
-					}
-				}
+
 			}
 		}
 	}
@@ -97,14 +92,14 @@ public class Alquileres implements IAlquileres {
 		} else if (vehiculo == null) {
 			throw new OperationNotSupportedException("ERR: El vehiculo no existe");
 		}
-		Alquiler alquiler = new Alquiler(cliente, vehiculo,
-				LocalDate.parse(fechaAlquiler, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		Alquiler alquiler = null;
+
+		alquiler = new Alquiler(cliente, vehiculo, LocalDate.parse(fechaAlquiler, FORMAT_FECHA));
 
 		if (!fechaDevolucion.isBlank()) {
-			try {
-				alquiler.devolver(LocalDate.parse(fechaDevolucion, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-			} catch (OperationNotSupportedException e) {
-			}
+
+			alquiler.devolver(LocalDate.parse(fechaDevolucion, FORMAT_FECHA));
+
 		}
 
 		return alquiler;
@@ -139,11 +134,9 @@ public class Alquileres implements IAlquileres {
 	private Element getElemento(Document documentoXml, Alquiler alquiler) {
 		Element elemento = documentoXml.createElement(ALQUILER);
 		elemento.setAttribute(CLIENTE, alquiler.getCliente().getDni());
-		elemento.setAttribute(FECHA_ALQUILER,
-				alquiler.getFechaAlquiler().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		elemento.setAttribute(FECHA_ALQUILER, String.format("%s", alquiler.getFechaAlquiler()));
 		if (alquiler.getFechaDevolucion() != null) {
-			elemento.setAttribute(FECHA_DEVOLUCION,
-					alquiler.getFechaDevolucion().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+			elemento.setAttribute(FECHA_DEVOLUCION, String.format("%s", alquiler.getFechaDevolucion()));
 
 		}
 		elemento.setAttribute(VEHICULO, alquiler.getVehiculo().getMatricula());

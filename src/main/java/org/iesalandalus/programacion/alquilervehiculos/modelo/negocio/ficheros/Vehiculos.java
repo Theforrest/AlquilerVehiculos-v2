@@ -72,20 +72,13 @@ public class Vehiculos implements IVehiculos {
 			Node nodo = lista.item(i);
 			if (nodo.getNodeType() == Node.ELEMENT_NODE) {
 				Element elemento = (Element) nodo;
-				Vehiculo vehiculo = null;
 				try {
-					vehiculo = getVehiculo(elemento);
-				} catch (IllegalArgumentException e) {
-					System.out.printf("%s%n", e.getMessage());
+					insertar(getVehiculo(elemento));
+				} catch (OperationNotSupportedException | IllegalArgumentException e) {
+					System.out.printf("ERROR: No se ha podido insertar el vehículo número %s -> %s%n", i,
+							e.getMessage());
 				}
-				if (vehiculo != null) {
-					try {
-						insertar(vehiculo);
-					} catch (OperationNotSupportedException e) {
-						System.out.printf("ERROR: No se ha podido insertar el vehiculo: %s -> %s%n", vehiculo,
-								e.getMessage());
-					}
-				}
+
 			}
 		}
 	}
@@ -155,14 +148,14 @@ public class Vehiculos implements IVehiculos {
 		elemento.setAttribute(MATRICULA, vehiculo.getMatricula());
 
 		if (vehiculo instanceof Turismo turismo) {
-			elemento.setAttribute(CILINDRADA, Integer.toString(turismo.getCilindrada()));
+			elemento.setAttribute(CILINDRADA, String.format("%s", turismo.getCilindrada()));
 			elemento.setAttribute(TIPO, TURISMO);
 		} else if (vehiculo instanceof Autobus autobus) {
-			elemento.setAttribute(PLAZAS, Integer.toString(autobus.getPlazas()));
+			elemento.setAttribute(PLAZAS, String.format("%s", autobus.getPlazas()));
 			elemento.setAttribute(TIPO, AUTOBUS);
 		} else if (vehiculo instanceof Furgoneta furgoneta) {
-			elemento.setAttribute(PMA, Integer.toString(furgoneta.getPma()));
-			elemento.setAttribute(PLAZAS, Integer.toString(furgoneta.getPlazas()));
+			elemento.setAttribute(PMA, String.format("%s", furgoneta.getPma()));
+			elemento.setAttribute(PLAZAS, String.format("%s", furgoneta.getPlazas()));
 			elemento.setAttribute(TIPO, FURGONETA);
 		}
 
