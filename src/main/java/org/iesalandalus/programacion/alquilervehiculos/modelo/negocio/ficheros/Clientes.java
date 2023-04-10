@@ -74,6 +74,9 @@ public class Clientes implements IClientes {
 	}
 
 	private Cliente getCliente(Element elemento) {
+		if (elemento == null) {
+			throw new NullPointerException("ERROR: El elemento no puede ser nulo.");
+		}
 		String nombre = elemento.getAttribute(NOMBRE);
 		String dni = elemento.getAttribute(DNI);
 		String telefono = elemento.getAttribute(TELEFONO);
@@ -109,6 +112,12 @@ public class Clientes implements IClientes {
 	}
 
 	private Element getElemento(Document documentoXml, Cliente cliente) {
+		if (documentoXml == null) {
+			throw new NullPointerException("ERROR: El documento no puede ser nulo.");
+		}
+		if (cliente == null) {
+			throw new NullPointerException("ERROR: El cliente no puede ser nulo.");
+		}
 		Element elemento = documentoXml.createElement(CLIENTE);
 		elemento.setAttribute(NOMBRE, cliente.getNombre());
 		elemento.setAttribute(DNI, cliente.getDni());

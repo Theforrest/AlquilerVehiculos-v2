@@ -84,6 +84,9 @@ public class Vehiculos implements IVehiculos {
 	}
 
 	private Vehiculo getVehiculo(Element elemento) {
+		if (elemento == null) {
+			throw new NullPointerException("ERROR: El elemento no puede ser nulo.");
+		}
 		String marca = elemento.getAttribute(MARCA);
 		String modelo = elemento.getAttribute(MODELO);
 		String matricula = elemento.getAttribute(MATRICULA);
@@ -142,6 +145,12 @@ public class Vehiculos implements IVehiculos {
 	}
 
 	private Element getElemento(Document documentoXml, Vehiculo vehiculo) {
+		if (documentoXml == null) {
+			throw new NullPointerException("ERROR: El documento no puede ser nulo.");
+		}
+		if (vehiculo == null) {
+			throw new NullPointerException("ERROR: El vehículo no puede ser nulo.");
+		}
 		Element elemento = documentoXml.createElement(VEHICULO);
 		elemento.setAttribute(MARCA, vehiculo.getMarca());
 		elemento.setAttribute(MODELO, vehiculo.getModelo());
