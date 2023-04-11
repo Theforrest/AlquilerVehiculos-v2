@@ -88,23 +88,23 @@ public class Alquileres implements IAlquileres {
 		String clienteTexto = elemento.getAttribute(CLIENTE);
 		String vehiculoTexto = elemento.getAttribute(VEHICULO);
 		String fechaAlquiler = elemento.getAttribute(FECHA_ALQUILER);
-		String fechaDevolucion = elemento.getAttribute(FECHA_DEVOLUCION);
 
 		Cliente cliente = Clientes.getInstancia().buscar(Cliente.getClienteConDni(clienteTexto));
 		if (cliente == null) {
 			throw new OperationNotSupportedException("ERR: El cliente no existe");
 		}
-		
+
 		Vehiculo vehiculo = Vehiculos.getInstancia().buscar(Vehiculo.getVehiculoConMatricula(vehiculoTexto));
 		if (vehiculo == null) {
 			throw new OperationNotSupportedException("ERR: El vehiculo no existe");
 		}
-		
+
 		Alquiler alquiler;
 
 		alquiler = new Alquiler(cliente, vehiculo, LocalDate.parse(fechaAlquiler, FORMATO_FECHA));
 
-		if (!fechaDevolucion.isBlank()) {
+		if (elemento.hasAttribute(FECHA_DEVOLUCION)) {
+			String fechaDevolucion = elemento.getAttribute(FECHA_DEVOLUCION);
 
 			alquiler.devolver(LocalDate.parse(fechaDevolucion, FORMATO_FECHA));
 

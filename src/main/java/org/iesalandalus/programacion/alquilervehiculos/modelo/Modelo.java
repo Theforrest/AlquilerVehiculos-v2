@@ -22,7 +22,7 @@ public abstract class Modelo {
 
 	protected Modelo(FactoriaFuenteDatos factoriaFuenteDatos) {
 		if (factoriaFuenteDatos == null) {
-			throw new NullPointerException("");
+			throw new NullPointerException("La factoria de datos no puede ser nula");
 		}
 		setFuenteDatos(factoriaFuenteDatos.crear());
 
